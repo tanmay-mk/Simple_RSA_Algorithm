@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1716357266 source:c:\users\tanma\onedrive\desktop\digital signature\simplersa\main.c
+	<stdio.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	"RSA.h"
+
+1716357639 source:c:\users\tanma\onedrive\desktop\digital signature\simplersa\rsa.c
+	"RSA.h"
+
+1716357070 c:\users\tanma\onedrive\desktop\digital signature\simplersa\rsa.h
+	<stdint.h>
+	<stdbool.h>
+
