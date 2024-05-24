@@ -33,9 +33,9 @@
 
 bool CheckPrimeNumber(uint32_t num)
 {
-    for (uint32_t i = 2; i <= num / 2; i++)
+    for (uint32_t i = 2; i <= (num / 2); i++)
     {
-        // check if num is divisible by any number.
+        // check if num is divisible by any number less than num/2.
         if (num % i == 0)
         {
             return false;
@@ -56,6 +56,7 @@ int main()
 
     if ((p*q <= 0xFF) || (CheckPrimeNumber(p) == false) || (CheckPrimeNumber(q) == false))
     {
+        //encode any data byte-by-byte
         printf("Enter two prime numbers (p & q) such that (p * q) > 256:\n");
         return -1;
     }
@@ -69,7 +70,7 @@ int main()
                         "accept up to 4 digit prime numbers to generate public and "
                         "private keys, and then encrypt this message using the public "
                         "key and decrypts it using private key. It then compares the decrypted"
-                        "message against this message and check for correctness.";
+                        "message against this message and checks for correctness.";
 
 
     uint64_t EncryptedMsg[MAX_SIZE] = {0};

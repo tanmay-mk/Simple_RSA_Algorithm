@@ -22,27 +22,49 @@
  * SOFTWARE.
  */
 
+/*Includes*/
 #include "RSA.h"
 
-#define RSA_DEBUG
+/*Defines*/
+#undef RSA_DEBUG
 
+/*Enums*/
+
+/*Structs*/
+//structure to hold parameters for RSA
 typedef struct {
-    uint32_t p;
-    uint32_t q;
-    uint32_t n;
-    uint32_t phi_n;
+    uint32_t p;     /*First prime number    */
+    uint32_t q;     /*Second prime number   */
+    uint32_t n;     /*n = pq                */
+    uint32_t phi_n; /*phi(n) = ((p-1)(q-1)) */
 }RSA_t;
 
-RSA_t RSA = {
+/*Global variables for this file*/
+static RSA_t RSA = {
     .p      = 0,
     .q      = 0,
     .n      = 0,
     .phi_n  = 0
 };
 
+/*Exported global variables*/
+
+/*Imported global variables*/
 key_t public_key;
 key_t private_key;
 
+/*Private functions*/
+
+/*
+ * @brief   : Calculate GCD of two numbers
+ *
+ * @params  : uint32_t
+ *              num1    : number of which GCD is to be calculated
+ *              num2    : number of which GCD is to be calculated
+ *
+ * @returns : uint32_t
+ *              GCD of num1 & num2
+ */
 static uint32_t GCD(uint32_t num1, uint32_t num2)
 {
     uint32_t gcd = ((num1 < num2)? num1 : num2);
@@ -58,6 +80,17 @@ static uint32_t GCD(uint32_t num1, uint32_t num2)
     return gcd;
 }
 
+/*
+ * @brief   : Generate private and public keys for RSA
+ *
+ * @params  : uint32_t
+ *              p    : first prime number
+ *              q    : second prime number
+ *
+ * @returns : bool
+ *              true : if key generation is successful
+ *              false: if key generation fails
+ */
 static bool GenerateKeys(uint32_t p, uint32_t q)
 {
     RSA.p       = p;
@@ -93,18 +126,32 @@ static bool GenerateKeys(uint32_t p, uint32_t q)
     private_key.mod = RSA.n;
     private_key.exp = d;
 
-    //printf("p = %u, q = %u, n = %u, phi_n = %u, e = %u, d = %u\n\n",
-    //       RSA.p, RSA.q, RSA.n, RSA.phi_n, e, d);
+#ifdef RSA_DEBUG
+    printf("p = %u, q = %u, n = %u, phi_n = %u, e = %u, d = %u\n\n",
+           RSA.p, RSA.q, RSA.n, RSA.phi_n, e, d);
+#endif // RSA_DEBUG
 
     return true;
 }
 
+/*
+ * @brief   : Encrypt a byte using public/private key
+ *
+ * @params  : uint8_t
+ *              m    : 1 byte message to encrypt
+ *            key_t
+ *              *key : pointer to the key to be used for encryption
+ *
+ * @returns : uint64_t
+ *              cipher of 'm'
+ */
 static uint64_t Encrypt(uint8_t m, key_t *key)
 {
     uint32_t n = key->mod, e = key->exp;
 
     uint64_t c = 1;
 
+    // c = ((m^e)%n)
     while (e > 0)
     {
         c = (c * m);
@@ -112,17 +159,31 @@ static uint64_t Encrypt(uint8_t m, key_t *key)
         e--;
     }
 
-    //printf("m = %u, e = %u, n = %u, c = %u\n", m, key->exp, n, c);
+#ifdef RSA_DEBUG
+    printf("m = %u, e = %u, n = %u, c = %u\n", m, key->exp, n, c);
+#endif // RSA_DEBUG
 
     return c;
 }
 
-static uint8_t Decrypt(uint32_t c, key_t *key)
+/*
+ * @brief   : Decrypt cipher using public/private key
+ *
+ * @params  : uint64_t
+ *              c    : cipher text
+ *            key_t
+ *              *key : pointer to the key to be used for decryption
+ *
+ * @returns : uint8_t
+ *              de-ciphered 'm'
+ */
+static uint8_t Decrypt(uint64_t c, key_t *key)
 {
     uint32_t n = key->mod, d = key->exp;
 
     uint64_t m = 1;
 
+    // m = ((c^d)%n)
     while (d > 0)
     {
         m = (m * c);
@@ -130,11 +191,14 @@ static uint8_t Decrypt(uint32_t c, key_t *key)
         d--;
     }
 
-    //printf("c = %u, d = %u, n = %u, m = %u\n", c, key->exp, n, m);
+#ifdef RSA_DEBUG
+    printf("c = %u, d = %u, n = %u, m = %u\n", c, key->exp, n, m);
+#endif // RSA_DEBUG
 
     return ((uint8_t)m);
 }
 
+/*Global functions*/
 void RSA_Encrypt(uint8_t *text, uint32_t textSize, uint64_t *encryptedData, key_t *key)
 {
     for (uint32_t i=0; i<textSize; i++)
@@ -155,3 +219,5 @@ bool RSA_Init(uint32_t p, uint32_t q)
 {
     return (GenerateKeys(p, q));
 }
+
+/*EOF*/
